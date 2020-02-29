@@ -1,42 +1,11 @@
 const request = require('supertest');
-const jwt = require('jsonwebtoken');
-const mongoose = require('mongoose');
 
-const app = require('../src/app');
 const User = require('../src/models/user');
-
-// ========= Default dataset to work with tests =========
-const existingUserId = new mongoose.Types.ObjectId();
-const existingUser = {
-	_id: existingUserId,
-	name: 'existingUser',
-	email: 'terte353@example.com',
-	password: 'existingUser154489652!@!@',
-	tokens: [{
-		token: jwt.sign({ _id: existingUserId }, process.env.JWT_SECRET)
-	}] 
-};
-
-const nonExistingUserId = new mongoose.Types.ObjectId();
-const nonExistingUser = {
-	_id: nonExistingUserId,
-	name: 'nonExistingUser',
-	email: 'cedaper353@example.com',
-	password: 'nonExistingUser154489652!@!@',
-	tokens: [{
-		token: jwt.sign({ _id: nonExistingUserId }, process.env.JWT_SECRET)
-	}] 
-};
+const app = require('../src/app');
+const {existingUserId ,existingUser ,setupDatabase} = require('./fixtures/db.js');
 
 // Runs for every test case in this suite.
-beforeEach(async () => {
-	await User.deleteMany();
-	
-	// After wipping the whole users document insert a new one
-	// to have a registry to work with. Some test may need it 
-	// such as uploading avatar image or even logging in.
-	await new User(existingUser).save(); 
-});
+beforeEach(setupDatabase);
 
 // =============== User test cases ===============
 
@@ -122,7 +91,6 @@ test('Should not delete account for unauthenticated user', async () => {
 		.expect(401)
 });
 
-
 test('Should not upload avatar image', async () => {
 	await request(app)
 		.post('/users/profile/avatar')
@@ -133,3 +101,26 @@ test('Should not upload avatar image', async () => {
 	let user = await User.findById(existingUserId);
 	expect(user.avatar).toEqual(expect.any(Buffer));
 });
+
+test('Should update valid user fields', async () => {
+	// Change the name of the existing user.
+	await request(app)
+		.patch('/users/profile')
+		.set('Authorization', `Bearer ${existingUser.tokens[0].token}`)
+		.send({name: "vasilis"})
+		.expect(200)
+
+	// Check if the name was been successfully updated.
+	let user = await User.findById(existingUserId);
+	expect(user.name).toBe("vasilis");
+});
+
+test('Should not update invalid user fields', async () => {
+	// Change the name of the existing user.
+	await request(app)
+		.patch('/users/profile')
+		.set('Authorization', `Bearer ${existingUser.tokens[0].token}`)
+		.send({location: 30.456489})
+		.expect(400)
+});
+
