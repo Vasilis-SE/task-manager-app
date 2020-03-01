@@ -48,7 +48,7 @@ test('Fetch all user tasks', async () => {
 	expect(response.body.length).toEqual(2);
 });
 
-test('Delete user task', async () => {
+test('Should not delete other user task', async () => {
 	// Attempt to delete user task through another user (should fail)
 	let response = await request(app)
 		.delete('/tasks/:id')
