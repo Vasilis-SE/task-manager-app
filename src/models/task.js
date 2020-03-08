@@ -14,6 +14,14 @@ const taskSchema = new mongoose.Schema({
 		required: true,
 		minlength: 10
 	},
+	isAssignedToGroup: {
+		type: Boolean,
+		default: false
+	},
+	groupid: {
+		type: mongoose.Schema.Types.ObjectId,
+		ref: 'Group'
+	},
 	complete: {
 		type: Boolean,
 		default: false
