@@ -4,17 +4,17 @@ const Group = require('../models/group');
 const authentication = require("../middleware/authentication");
 const router = new express.Router();
 
-router.post('/tasks/:groupid', authentication, async (request, response) => {
+router.post('/tasks', authentication, async (request, response) => {
 	let tempTaskObj = {
 		...request.body,
 		userid: request.user._id
 	};
 
 	// If group id is set then need to check if exists and then store the task.
-	if(request.params.groupid) {
-		let group = await Group.findOne({ _id: request.params.groupid });
+	if(request.body.groupid !== undefined) {
+		let group = await Group.findOne({ _id: request.body.groupid });
 		if(!group) { return response.status(404).send(); }
-		tempTaskObj.groupid = request.params.groupid;
+		tempTaskObj.groupid = request.body.groupid;
 		tempTaskObj.isAssignedToGroup = true;
 	}
 
