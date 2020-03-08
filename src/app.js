@@ -3,6 +3,7 @@ require('./database/mongoose');
 
 const userRouter = require('./routers/user');
 const taskRouter = require('./routers/task');
+const groupRouter = require('./routers/group');
 
 const app = express();
 
@@ -10,5 +11,6 @@ const app = express();
 app.use(express.json());
 app.use(userRouter);
 app.use(taskRouter);
+app.use(groupRouter);
 
 module.exports = app;
