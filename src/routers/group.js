@@ -1,5 +1,6 @@
 const express = require("express");
 const Group = require('../models/group');
+const Task = require('../models/task');
 const authentication = require("../middleware/authentication");
 const router = new express.Router();
 
@@ -29,11 +30,16 @@ router.get('/groups/:id', authentication, async (request, response) => {
 	}
 });
 
-// GET ?complete=true/false 
-// GET ?desc=Name of group, or part of it 
+// GET /groups?complete=true/false.
+// GET /groups?desc=Name of group, or part of it.
+// GET /groups?from=1256894578 from stamp to search.
+// GET /groups?to=1256894578 until stamp to search.
 router.get('/groups', authentication, async (request, response) => {
 	let match = { userid: request.user._id };
+	
 	if(request.query.complete) { match.complete = request.query.complete === 'true'; }
+	if(request.query.from) { match.createdAt = { $gte: parseInt(request.query.from) } }
+	if(request.query.to) { match.createdAt = { $lte: parseInt(request.query.to) } }
 	if(request.query.desc) { 
 		let description = request.query.desc.trim();
 		match.description = new RegExp(description, 'i');
@@ -46,6 +52,27 @@ router.get('/groups', authentication, async (request, response) => {
 		response.status(404).send(err);
 	}
 });
+
+router.delete('/groups/:id', authentication, async (request, response) => {
+	try {
+		let group = await Group.findOneAndDelete({
+			_id: request.params.id,
+			userid: request.user._id
+		});
+
+		let tasks = await Task.deleteMany({
+			groupid: request.params.id,
+			userid: request.user._id
+		});
+		
+		if(!group) { response.status(404).send(); }
+		response.send({group, tasks});
+	} catch(err) {
+		response.status(500).send(err)
+	}
+});
+
+
 
 
 module.exports = router;

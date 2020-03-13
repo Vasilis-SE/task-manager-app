@@ -29,13 +29,17 @@ router.post('/tasks', authentication, async (request, response) => {
 });
 
 // GET /tasks?complete=true
-// GET /tasks?&limit=10&skip=10
-// GET /tasks?&sortBy=createdAt:asc
+// GET /tasks?limit=10&skip=10
+// GET /tasks?sortBy=createdAt:asc
+// GET /tasks?from=1256894578 from stamp to search.
+// GET /tasks?to=1256894578 until stamp to search.
 router.get('/tasks', authentication, async (request, response) => {
 	let match = {};
 	let sortOptions = {};
 
 	if(request.query.complete) { match.complete = request.query.complete === 'true'; }
+	if(request.query.from) { match.createdAt = { $gte: parseInt(request.query.from) } }
+	if(request.query.to) { match.createdAt = { $lte: parseInt(request.query.to) } }
 	if(request.query.sortBy) {
 		let parts = request.query.sortBy.split(":");
 		sortOptions[parts[0].trim()] = parts[1].trim() === 'desc' ? -1 : 1;
