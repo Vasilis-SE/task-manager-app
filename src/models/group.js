@@ -15,9 +15,11 @@ const groupSchema = new mongoose.Schema({
 	complete: {
 		type: Boolean,
 		default: false
-	}
+	},
+	createdAt: Number,
+  	updatedAt: Number
 }, {
-	timestamps: true
+	timestamps: { currentTime: () => Math.floor(Date.now() / 1000) }
 });
 
 const Groups = mongoose.model("Group", groupSchema);

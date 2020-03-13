@@ -51,9 +51,11 @@ const userSchema = new mongoose.Schema({
 	}],
 	avatar: {
 		type: Buffer
-	}
+	},
+	createdAt: Number,
+  	updatedAt: Number
 }, {
-	timestamps: true
+	timestamps: { currentTime: () => Math.floor(Date.now() / 1000) }
 });
 
 userSchema.virtual('tasks', {
