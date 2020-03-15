@@ -68,7 +68,28 @@ router.delete('/groups/:id', authentication, async (request, response) => {
 		if(!group) { response.status(404).send(); }
 		response.send({group, tasks});
 	} catch(err) {
-		response.status(500).send(err)
+		response.status(500).send(err);
+	}
+});
+
+router.patch('/groups/:id', authentication, async (request, response) => {
+	let updates = Object.keys(request.body);
+	let eligibleFields = ['description', 'complete'];
+	let isValidUpdate = updates.every((update) => eligibleFields.includes(update));
+
+	if(!isValidUpdate) { response.status(400).send(); }
+
+	try {
+		let group = await Group.findOne({
+			_id: request.params.id,
+			userid: request.user._id
+		});
+
+		updates.forEach((update) => group[update] = request.body[update]);
+		await group.save();
+		response.send(group);
+	} catch(err) {
+		response.status(500).send(err);
 	}
 });
 
