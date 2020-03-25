@@ -20,17 +20,6 @@ const uploader = multer({
 	}
 });
 
-
-router.get('/status', async (request, response) => {
-	response.status(200).send({
-		message: 'Everything is ok!'
-	});
-});
-
-
-
-
-
 router.post('/users', async (request, response) => {
 	let user = new User(request.body);
 
