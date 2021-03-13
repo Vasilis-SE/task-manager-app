@@ -11,7 +11,7 @@
 							</v-toolbar>
 							<v-card-text>
 								<v-form>
-                 					<v-text-field id="username" label="Email" name="login" :prepend-icon="user_icon" type="text" placeholder="Type your email here..."/>
+                 					<v-text-field id="email" label="Email" name="login" :prepend-icon="user_icon" type="text" placeholder="Type your email here..."/>
                   					<v-text-field id="password" label="Password" name="password" :prepend-icon="lock_icon" type="password" placeholder="Type your password here..."/>
 								</v-form>
 							</v-card-text>
