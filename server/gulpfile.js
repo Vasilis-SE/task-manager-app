@@ -1,5 +1,7 @@
 const gulp = require("gulp");
 const babel = require('gulp-babel');
+const obfuscate = require('gulp-obfuscate');
+const closureCompiler = require('gulp-closure-compiler');
 
 gulp.task('babel', function() {
     return gulp.src('src/**/*.js')
@@ -9,4 +11,9 @@ gulp.task('babel', function() {
         .pipe(gulp.dest('dist'))
 });
 
-gulp.task("default", gulp.series('babel'));
+gulp.task('obfuscateJS', function() {
+    return gulp.src('dist/**/*.js')
+        .pipe(obfuscate({ replaceMethod: obfuscate.ZALGO }));
+});
+
+gulp.task("default", gulp.series('babel', 'obfuscateJS'));
